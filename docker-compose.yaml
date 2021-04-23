@@ -1,0 +1,39 @@
+version: '3.5'
+
+services:
+  rabbit:
+    container_name: rabbitContainer
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ./docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBIT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBIT_PASS}
+    networks:
+      - loggerApp
+  mysqldb:
+#    build:
+#      context: .
+#      dockerfile: ./Dockerfile
+    container_name: mysql-local
+    image: "mysql:latest"
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password --secure-file-priv=""
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_PASSWORD=${MYSQL_PASS}
+      - MYSQL_USER=${MYSQL_USER_NAME}
+    volumes:
+      - ./docker-conf/mysql-data:/var/lib/mysql
+      - ./log_data.csv:/log_data.csv
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+networks:
+  loggerApp:
